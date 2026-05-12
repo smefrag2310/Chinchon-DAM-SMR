@@ -51,54 +51,6 @@ public class Round {
 		discardPile.addCard(card);
 	}
 	
-	public void roundEnd() {
-		
-		StringBuilder sb = new StringBuilder();
-		
-		for(Player player: players) {
-			sb.append(String.format("\t%s\t|",player.getNickname()));
-		}
-		sb.append("\n");
-		for(Player player: players) {
-			player.addPoints(analyzer.calculatePoints(analyzer.obtainCombinations(player.getHand().getCards()),
-							player.getHand().getCards(),player.getPoints()));
-			
-			sb.append(String.format("\t%d\t|",
-					analyzer.calculatePoints(analyzer.obtainCombinations(player.getHand().getCards()),
-							player.getHand().getCards(),player.getPoints())));
-		}
-		sb.append("\n");
-		for(Player player: players) {
-			sb.append(String.format("\t%d\t|",player.getPoints()));
-		}
-		sb.append("\n");
-		
-		console.writeLine(sb.toString());
-		return;
-	}
-	
-	public void refillDeckFromDiscard() {
-		if(deck.getCards().isEmpty()) {
-			deck.getCards().addAll(discardPile.clearAndReturn());
-			deck.shuffle();
-		}
-	}
-	
-	public void playerManagement(Player player) {
-		if(!roundEnd) {
-		player.decisionMaking(this);
-		}else {
-			roundEnd();
-		}
-	}
-	
-	public String seeLastCard() {
-		if(discardPile.getCards().isEmpty()) {
-			return "Vacío";
-		}
-		return discardPile.getLastCard().toString();
-	}
-	
 	public void start() {
 		initialDistribution();
 		playersTurn();
@@ -120,20 +72,60 @@ public class Round {
 		for(Player p: players) {
 			playerManagement(p);
 		}
-		setTurn(getTurn() + 1);
+		turn++;
 		}while(!isRoundEnd());
+		
+		roundEnd();
+	}
+
+	public void playerManagement(Player player) {
+		if(!roundEnd) {
+			player.decisionMaking(this);
+		}
+	}
+	
+	public void refillDeckFromDiscard() {
+		if(deck.getCards().isEmpty()) {
+			deck.getCards().addAll(discardPile.clearAndReturn());
+			deck.shuffle();
+		}
+	}
+	
+	public void resetPlayersHand() {
+		for(Player p: players) {
+			p.getHand().resetHand();
+		}
+	}
+	
+	public void roundEnd() {
+			
+			StringBuilder sb = new StringBuilder();
+			int roundPoints;
+			
+			for(Player player: players) {
+				sb.append(String.format("\t%s\t|",player.getNickname()));
+			}
+			sb.append("\n");
+			for(Player player: players) {
+				
+				roundPoints = analyzer.calculatePoints(analyzer.obtainCombinations(player.getHand().getCards()),
+						player.getHand().getCards());
+				
+				player.addPoints(roundPoints);
+				
+				sb.append(String.format("\t%d\t|",roundPoints));
+			}
+			sb.append("\n");
+			for(Player player: players) {
+				sb.append(String.format("\t%d\t|",player.getPoints()));
+			}
+			sb.append("\n");
+			
+			console.writeLine(sb.toString());
 	}
 	
 	public boolean checkScore(int score) {
 		return score <= maxScore;
-	}
-
-	public int getNumber() {
-		return number;
-	}
-	
-	public static void setNumber(int number) {
-		Round.number= number;
 	}
 	
 	public String seeLastCardDiscardPile() {
@@ -144,14 +136,16 @@ public class Round {
 		return discardPile.getLastCard();
 	}
 	
-	public void resetPlayersHand() {
-		for(Player p: players) {
-			p.getHand().resetHand();
-		}
-	}
-	
 	public List<Card> getAllPossibleCards(){
 		return deck.obtainAllCards();
+	}
+
+	public int getNumber() {
+		return number;
+	}
+	
+	public static void setNumber(int number) {
+		Round.number= number;
 	}
 
 	public boolean isRoundEnd() {

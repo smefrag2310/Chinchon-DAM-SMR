@@ -57,17 +57,22 @@ public class HumanPlayer extends Player{
 		
 		option= console.readIntInRange(1, canEndRound ? 2:1);
 		
+		if(option==1) {
 		console.writeLine("===== Mano actual =====");
 		console.writeLine(hand.enumeratedCards());
 		console.writeLine("Escoje cual descartar: ");
 		discardIndex= console.readIntInRange(1, hand.getCards().size());
 		card= hand.getCards().get(discardIndex-1);
+		}else {
+			console.writeLine("===== Cartas combinadas =====");
+			
+		}
 		
 			System.out.printf("Se ha descartado la siguiente carta: %s\n",card);
 			hand.removeCard(card);
 			round.discardCard(card);
 			
-			if(option==2) {
+			if(option==2 && canEndRound) {
 			round.setRoundEnd(true);
 			}
 		

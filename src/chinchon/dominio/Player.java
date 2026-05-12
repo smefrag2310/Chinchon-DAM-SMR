@@ -1,5 +1,8 @@
 package chinchon.dominio;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import chinchon.app.Round;
 
 public abstract class Player {
@@ -23,11 +26,25 @@ public abstract class Player {
 	public String showCards() {
 		return hand.toString();
 	}
+	
+	public String combinatedCardsToString() {
+		List<Combination> combinations = new ArrayList<>(analyzer.obtainCombinations(hand.getCards()));
+		StringBuilder sb= new StringBuilder();
+		
+		for(CombinationType type: CombinationType.values()) {
+			
+		}
+		
+	}
+	
+	public String nonCombinatedCardsToString() {
+		
+	}
 
 	public abstract void decisionMaking(Round round);
 	
-	public void addPoints(int points) {
-		this.points+=points;
+	public void addPoints(int punctuation) {
+		points += punctuation;
 	}
 
 	public Hand getHand() {

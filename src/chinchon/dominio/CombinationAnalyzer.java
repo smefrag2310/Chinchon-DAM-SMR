@@ -126,7 +126,7 @@ public class CombinationAnalyzer {
 		return new Combination(list,CombinationType.TRIPLE);
 	}
 	
-	public int calculatePoints(List<Combination> combinations,List<Card> hand,int points) {
+	public int calculatePoints(List<Combination> combinations,List<Card> hand) {
 
 		List<Card> remainingCards = new ArrayList<>();
 		Set<Card> combinationCards;
@@ -148,9 +148,7 @@ public class CombinationAnalyzer {
 						 .sum();
 		}
 		
-		points+=punctuation;
-		
-		return points;
+		return punctuation;
 		
 	}
 
@@ -158,9 +156,7 @@ public class CombinationAnalyzer {
 
 		List<Card> remainingCards = new ArrayList<>();
 		Set<Card> combinationCards;
-		int punctuation,current;
-		
-		current=points;
+		int punctuation;
 		
 		combinationCards = combinations.stream()
 							.flatMap(c -> c.getCards().stream())
@@ -179,7 +175,7 @@ public class CombinationAnalyzer {
 		}
 		
 		
-		return current + punctuation;
+		return points + punctuation;
 		
 	}
 	

@@ -50,9 +50,7 @@ public class MachinePlayer extends Player {
 
 		if (canEndRound) {
 			round.setRoundEnd(true);
-		} else {
-			round.setRoundEnd(false);
-		}
+		} 
 
 	}
 
