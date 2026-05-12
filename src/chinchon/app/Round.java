@@ -57,7 +57,7 @@ public class Round {
 		}
 		sb.append("\n");
 		for(Player player: players) {
-			sb.append(String.format("\t%d\t|",player.calculatePoints()));
+			sb.append(String.format("\t%d\t|",player.calculatePoints(player.obtainCombinations())));
 		}
 		sb.append("\n");
 		for(Player player: players) {

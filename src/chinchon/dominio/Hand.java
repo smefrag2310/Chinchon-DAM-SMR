@@ -28,18 +28,19 @@ public class Hand {
 	public void resetHand() {
 		cards.clear();
 	}
+	
+	public void organizeHand() {
+		cards.sort(Comparator.comparing(Card::getSuit)
+				.thenComparing(Card::getValue));
+	}
 
 	public String enumeratedCards() {
 		StringBuilder sb = new StringBuilder();
-		List<Card> list = new ArrayList<>();
+		
+		organizeHand();
 
-		list = cards.stream()
-				.sorted(Comparator.comparing(Card::getSuit)
-				.thenComparing(Card::getValue))
-				.toList();
-
-		for (int i = 0; i < list.size(); i++) {
-			sb.append(String.format("%d) %s\n", i + 1, list.get(i)));
+		for (int i = 0; i < cards.size(); i++) {
+			sb.append(String.format("%d) %s\n", i + 1, cards.get(i)));
 		}
 		return sb.toString();
 	}
@@ -48,14 +49,9 @@ public class Hand {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 
-		List<Card> list = new ArrayList<>();
+		organizeHand();
 
-		list = cards.stream()
-				.sorted(Comparator.comparing(Card::getSuit)
-				.thenComparing(Card::getValue))
-				.toList();
-
-		for (Card card : list) {
+		for (Card card : cards) {
 			sb.append(String.format("%s ", card.toString()));
 		}
 		return sb.toString();

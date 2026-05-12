@@ -88,7 +88,7 @@ public class MachinePlayer extends Player {
 		Card cardToDiscard;
 		boolean canEndRound;
 
-		canEndRound = checkCombinations() && round.getTurn() != 1 && round.checkScore(currentPoints());
+		canEndRound = checkCombinations() && round.getTurn() != 1 && round.checkScore(currentPoints(obtainCombinations()));
 
 		System.out.println("===== Descartar =====");
 		System.out.println("1) Descartar una carta");
@@ -125,8 +125,13 @@ public class MachinePlayer extends Player {
 
 		List<Card> secureCards = new ArrayList<>();
 		List<Card> remaining = new ArrayList<>(hand.getCards());
+		List<Card> combinations = new ArrayList<>();
+		
+		combinations= obtainCombinations().stream()
+				.flatMap(c -> c.getCards().stream())
+				.toList();
 
-		secureCards.addAll(obtainCombinations());
+		secureCards.addAll(combinations);
 		remaining.removeAll(secureCards);
 		secureCards.addAll(findAlmostLadders(remaining));
 		remaining.removeAll(secureCards);
@@ -196,7 +201,9 @@ public class MachinePlayer extends Player {
 
 		for (Suit suit : Suit.values()) {
 
-			list = cards.stream().filter(c -> c.getSuit() == suit).sorted(Comparator.comparing(c -> c.getValue()))
+			list = cards.stream()
+					.filter(c -> c.getSuit() == suit)
+					.sorted(Comparator.comparing(c -> c.getValue()))
 					.toList();
 
 			for (Card c : list) {
