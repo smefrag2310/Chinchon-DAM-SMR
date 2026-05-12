@@ -1,7 +1,6 @@
 package chinchon.dominio;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -31,6 +30,7 @@ public class MachinePlayer extends Player {
 
 		Random r = new Random();
 		int rNumber;
+		boolean canEndRound;
 
 		rNumber = r.nextInt(2);
 		if (rNumber == 0) {
@@ -38,12 +38,17 @@ public class MachinePlayer extends Player {
 		} else if (rNumber == 1) {
 			hand.getCards().add(round.drawDiscardPileCard());
 		}
+		
+		canEndRound= analyzer.checkCombinations(hand.getCards()) && round.getTurn() != 1
+				&& round.checkScore(analyzer.currentPoints(
+						analyzer.obtainCombinations(hand.getCards()),
+						hand.getCards(), points));
 
 		rNumber = r.nextInt(8);
 		round.discardCard(hand.getCards().get(rNumber));
 		hand.removeCard(hand.getCards().get(rNumber));
 
-		if (checkCombinations()) {
+		if (canEndRound) {
 			round.setRoundEnd(true);
 		} else {
 			round.setRoundEnd(false);
@@ -66,7 +71,7 @@ public class MachinePlayer extends Player {
 
 	public void chooseWhereToPick(Round round) {
 
-		List<Card> searchCards = new ArrayList<>(cardsForSearch());
+		List<Card> searchCards = new ArrayList<>(analyzer.cardsForSearch(hand.getCards()));
 
 		System.out.println("===== Robar =====");
 		System.out.println("1) Robar de la baraja");
@@ -83,12 +88,14 @@ public class MachinePlayer extends Player {
 
 	public void chooseCardToDiscard(Round round) {
 
-		List<Card> secureCards = new ArrayList<>(protectedCards());
+		List<Card> secureCards = new ArrayList<>(analyzer.protectedCards(hand.getCards()));
 		List<Card> insecureCards = new ArrayList<>();
 		Card cardToDiscard;
 		boolean canEndRound;
 
-		canEndRound = checkCombinations() && round.getTurn() != 1 && round.checkScore(currentPoints(obtainCombinations()));
+		canEndRound= analyzer.checkCombinations(hand.getCards()) && round.getTurn() != 1
+				&& round.checkScore(analyzer.currentPoints(
+						analyzer.obtainCombinations(hand.getCards()), hand.getCards(), points));
 
 		System.out.println("===== Descartar =====");
 		System.out.println("1) Descartar una carta");
@@ -118,134 +125,6 @@ public class MachinePlayer extends Player {
 		if (canEndRound) {
 			round.setRoundEnd(true);
 		}
-
-	}
-
-	public List<Card> protectedCards() {
-
-		List<Card> secureCards = new ArrayList<>();
-		List<Card> remaining = new ArrayList<>(hand.getCards());
-		List<Card> combinations = new ArrayList<>();
-		
-		combinations= obtainCombinations().stream()
-				.flatMap(c -> c.getCards().stream())
-				.toList();
-
-		secureCards.addAll(combinations);
-		remaining.removeAll(secureCards);
-		secureCards.addAll(findAlmostLadders(remaining));
-		remaining.removeAll(secureCards);
-		secureCards.addAll(findAlmostTriples(remaining));
-		remaining.removeAll(secureCards);
-
-		return secureCards;
-
-	}
-
-	public List<Card> cardsForSearch() {
-
-		List<Card> missing = new ArrayList<>();
-		Card c1, c2;
-		int v1, v2, min, max;
-
-		for (int i = 0; i < hand.getCards().size(); i++) {
-			for (int j = i + 1; j < hand.getCards().size(); j++) {
-
-				c1 = hand.getCards().get(i);
-				c2 = hand.getCards().get(j);
-
-				if (c1.getSuit() == c2.getSuit()) {
-
-					v1 = c1.getValue().getOrder();
-					v2 = c2.getValue().getOrder();
-
-					min = Math.min(v1, v2);
-					max = Math.max(v1, v2);
-
-					if (max - min == 2) {
-						missing.add(new Card(c1.getSuit(), Value.fromOrder(min + 1)));
-					}
-
-					if (max - min == 1) {
-						if (min > 1) {
-							missing.add(new Card(c1.getSuit(), Value.fromOrder(min - 1)));
-						}
-						if (max < 12) {
-							missing.add(new Card(c1.getSuit(), Value.fromOrder(max + 1)));
-						}
-					}
-
-				}
-
-				if (c1.getValue() == c2.getValue()) {
-
-					for (Suit s : Suit.values()) {
-						missing.add(new Card(s, c1.getValue()));
-					}
-
-				}
-
-			}
-		}
-
-		return missing;
-
-	}
-
-	public List<Card> findAlmostLadders(List<Card> cards) {
-
-		List<Card> list = new ArrayList<>();
-		List<Card> actual = new ArrayList<>();
-		List<Card> sequence = new ArrayList<>();
-		Card last;
-
-		for (Suit suit : Suit.values()) {
-
-			list = cards.stream()
-					.filter(c -> c.getSuit() == suit)
-					.sorted(Comparator.comparing(c -> c.getValue()))
-					.toList();
-
-			for (Card c : list) {
-				if (actual.isEmpty()) {
-					actual.add(c);
-				} else {
-					last = actual.get(actual.size() - 1);
-
-					if (c.getValue().getOrder() == last.getValue().getOrder() + 1) {
-						actual.add(c);
-					} else {
-
-						if (actual.size() == 2) {
-							sequence.addAll(actual);
-						}
-						actual.clear();
-						actual.add(c);
-					}
-				}
-			}
-			if (actual.size() == 2) {
-				sequence.addAll(actual);
-			}
-		}
-		return sequence;
-
-	}
-
-	public List<Card> findAlmostTriples(List<Card> cards) {
-
-		List<Card> list = new ArrayList<>();
-		List<Card> sequence = new ArrayList<>();
-
-		for (Value value : Value.values()) {
-
-			list = cards.stream().filter(c -> c.getValue() == value).toList();
-
-			if (list.size() == 2) {
-				sequence.addAll(list);
-			}
-		}
-		return sequence;
 
 	}
 

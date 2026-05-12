@@ -44,7 +44,10 @@ public class HumanPlayer extends Player{
 		boolean canEndRound;
 		Card card;
 		
-		canEndRound= checkCombinations() && round.getTurn() != 1 && round.checkScore(currentPoints(obtainCombinations()));
+		canEndRound= analyzer.checkCombinations(hand.getCards()) && round.getTurn() != 1
+				&& round.checkScore(analyzer.currentPoints(
+						analyzer.obtainCombinations(hand.getCards()),
+						hand.getCards(), points));
 		
 		console.writeLine("===== Descartar =====");
 		console.writeLine("1) Descartar una carta");

@@ -3,6 +3,7 @@ package chinchon.app;
 import java.util.List;
 
 import chinchon.dominio.Card;
+import chinchon.dominio.CombinationAnalyzer;
 import chinchon.dominio.Deck;
 import chinchon.dominio.DiscardPile;
 import chinchon.dominio.Player;
@@ -17,6 +18,7 @@ public class Round {
 	private static int number=0;
 	private boolean roundEnd;
 	private int turn=1;
+	private CombinationAnalyzer analyzer;
 	
 	public Round(Deck deck,DiscardPile discardPile,List<Player> players,int maxScore) {
 		this.deck=deck;
@@ -24,6 +26,7 @@ public class Round {
 		this.players=players;
 		this.maxScore= maxScore;
 		console= ConsoleInput.getInstance();
+		analyzer= CombinationAnalyzer.getInstance();
 		number++;
 	}
 	
@@ -57,7 +60,12 @@ public class Round {
 		}
 		sb.append("\n");
 		for(Player player: players) {
-			sb.append(String.format("\t%d\t|",player.calculatePoints(player.obtainCombinations())));
+			player.addPoints(analyzer.calculatePoints(analyzer.obtainCombinations(player.getHand().getCards()),
+							player.getHand().getCards(),player.getPoints()));
+			
+			sb.append(String.format("\t%d\t|",
+					analyzer.calculatePoints(analyzer.obtainCombinations(player.getHand().getCards()),
+							player.getHand().getCards(),player.getPoints())));
 		}
 		sb.append("\n");
 		for(Player player: players) {
