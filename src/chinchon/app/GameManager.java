@@ -22,6 +22,7 @@ public class GameManager {
 	private int maxScore;
 	private ConsoleInput console;
 	private Round round;
+	private boolean gameEnd;
 
 	public GameManager(int maxScore) {
 		this.players = new ArrayList<>();
@@ -38,8 +39,8 @@ public class GameManager {
 		System.out.println("Introduce el número de jugadores totales (2-5): ");
 		numPlayers = console.readIntInRange(2, 5);
 
-		System.out.printf("Introduce el número de jugadores humanos(1-%d): \n", numPlayers);
-		numHuman = console.readIntInRange(1, numPlayers);
+		System.out.printf("Introduce el número de jugadores humanos(0-%d): \n", numPlayers);
+		numHuman = console.readIntInRange(0, numPlayers);
 		numMachine = numPlayers - numHuman;
 
 		for (int i = 0; i < numHuman; i++) {
@@ -50,15 +51,13 @@ public class GameManager {
 
 		for (int i = 0; i < numMachine; i++) {
 			name = String.format("Máquina %d", i+1);
-			System.out.printf("Elige la dificultad de %s: \n1)Fácil\n2)Medio\n3)Difícil\n",name);
-			diff = console.readIntInRange(1, 3);
+			System.out.printf("Elige la dificultad de %s: \n1)Fácil\n2)Medio\n",name);
+			diff = console.readIntInRange(1, 2);
 			if (diff == 1) {
 				players.add(PlayerFactory.createMachinePlayer(name, Difficulty.EASY));
-			} else if (diff == 2) {
+			} else{
 				players.add(PlayerFactory.createMachinePlayer(name, Difficulty.MEDIUM));
-			} else {
-				players.add(PlayerFactory.createMachinePlayer(name, Difficulty.HARD));
-			}
+			} 
 		}
 	}
 
@@ -82,14 +81,23 @@ public class GameManager {
 		announceWinner();
 	}
 
-	public boolean gameEnd() {
+	public boolean gameEndByPoints() {
 		return players.stream().anyMatch(p -> p.getPoints() >= maxScore);
 	}
 
 	public void startRound() {
-		while (!gameEnd()) {
+		while (!gameEnd) {
 			System.out.printf("\n===== Ronda nº %d =====\n", round.getNumber());
 			round.start();
+			
+			if(round.isGameEnd()) {
+				gameEnd=true;
+			}
+			
+			if(gameEndByPoints()) {
+				gameEnd=true;
+			}
+			
 			resetNextRound();
 		}
 	}
@@ -103,15 +111,24 @@ public class GameManager {
 	}
 
 	public void announceWinner() {
+		
+		Player winnerChinchon;
+		Optional<Player> winnerPoints;
 
-		Optional<Player> winner = players.stream()
-				.collect(Collectors.minBy(Comparator.comparing(p -> p.getPoints())));
+		 if (round.getWinner() != null) {
+	            winnerChinchon = round.getWinner();
+	            System.out.printf("\n¡%s ha ganado la partida por CHINCHÓN!\n", winnerChinchon.getNickname());
+	            return;
+	        }
 
-		if (winner.isPresent()) {
-			System.out.printf("¡%s ha ganado la partida con %d puntos!\n", winner.get().getNickname(),
-					winner.get().getPoints());
-		}
+	        winnerPoints = players.stream()
+	                .collect(Collectors.minBy(Comparator.comparing(p -> p.getPoints())));
 
+	        if (winnerPoints.isPresent()) {
+	            System.out.printf("¡%s ha ganado la partida con %d puntos!\n",
+	                    winnerPoints.get().getNickname(),
+	                    winnerPoints.get().getPoints());
+	        }
 	}
 
 	public List<Player> getPlayers() {
@@ -132,6 +149,10 @@ public class GameManager {
 
 	public Round getRound() {
 		return round;
+	}
+	
+	public void setGameEnd(boolean gameEnd) {
+		this.gameEnd = gameEnd;
 	}
 
 }

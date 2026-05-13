@@ -8,16 +8,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CombinationAnalyzer {
-	
+
 	private static CombinationAnalyzer analyzer;
-	
+
 	private CombinationAnalyzer() {
-		
+
 	}
-	
+
 	public static CombinationAnalyzer getInstance() {
-		if(analyzer==null) {
-			analyzer= new CombinationAnalyzer();
+		if (analyzer == null) {
+			analyzer = new CombinationAnalyzer();
 		}
 		return analyzer;
 	}
@@ -30,32 +30,33 @@ public class CombinationAnalyzer {
 		List<Combination> triple = new ArrayList<>();
 
 		ladder = findLadderAndChinchon(remaining);
+		
+		adjustLaddersForAlmostTriples(ladder, remaining);
+		
 		for (Combination c : ladder) {
 			combinations.add(c);
 			remaining.removeAll(c.getCards());
 		}
-		
-		adjustLaddersForAlmostTriples(ladder,remaining);
 
 		triple = findEqualNumber(remaining);
 		for (Combination c : triple) {
 			combinations.add(c);
 			remaining.removeAll(c.getCards());
 		}
-		
+
 		return combinations;
 	}
 
 	public boolean checkCombinations(List<Card> hand) {
-		
+
 		List<Card> combinationsCards;
-		
+
 		combinationsCards = obtainCombinations(hand).stream()
-							.flatMap(c -> c.getCards().stream())
-							.toList();
-		
+				.flatMap(c -> c.getCards().stream())
+				.toList();
+
 		return combinationsCards.size() >= 6;
-		
+
 	}
 
 	public List<Combination> findLadderAndChinchon(List<Card> remaining) {
@@ -85,7 +86,7 @@ public class CombinationAnalyzer {
 					} else {
 
 						if (actual.size() >= 3) {
-							sequence.add(createLadderOrChinchon(actual));
+							sequence.add(createLadderOrChinchon(new ArrayList<>(actual)));
 						}
 						actual.clear();
 						actual.add(c);
@@ -93,7 +94,7 @@ public class CombinationAnalyzer {
 				}
 			}
 			if (actual.size() >= 3) {
-				sequence.add(createLadderOrChinchon(actual));
+				sequence.add(createLadderOrChinchon(new ArrayList<>(actual)));
 			}
 		}
 		return sequence;
@@ -106,7 +107,9 @@ public class CombinationAnalyzer {
 
 		for (Value value : Value.values()) {
 
-			list = remaining.stream().filter(c -> c.getValue() == value).toList();
+			list = remaining.stream()
+					.filter(c -> c.getValue() == value)
+					.toList();
 
 			if (list.size() >= 3) {
 				sequence.add(createTriples(list));
@@ -114,89 +117,84 @@ public class CombinationAnalyzer {
 		}
 		return sequence;
 	}
-	
-	public Combination createLadderOrChinchon(List<Card> list){
-		if(list.size() == 7) {
-			return new Combination(list,CombinationType.CHINCHON);
+
+	public Combination createLadderOrChinchon(List<Card> list) {
+		if (list.size() == 7) {
+			return new Combination(list, CombinationType.CHINCHON);
 		}
-		return new Combination(list,CombinationType.LADDER);
+		return new Combination(list, CombinationType.LADDER);
 	}
-	
+
 	public Combination createTriples(List<Card> list) {
-		return new Combination(list,CombinationType.TRIPLE);
+		return new Combination(list, CombinationType.TRIPLE);
 	}
-	
-	public int calculatePoints(List<Combination> combinations,List<Card> hand) {
+
+	public int calculatePoints(List<Combination> combinations, List<Card> hand) {
 
 		List<Card> remainingCards = new ArrayList<>();
 		Set<Card> combinationCards;
-		int punctuation=0;
-		
-		combinationCards = combinations.stream()
-							.flatMap(c -> c.getCards().stream())
-							.collect(Collectors.toSet());
-		
+		int punctuation = 0;
+
+		combinationCards = combinations.stream().flatMap(c -> c.getCards().stream()).collect(Collectors.toSet());
+
 		remainingCards = hand.stream()
-						.filter(c -> !combinationCards.contains(c))
-						.toList();
-		
-		if(remainingCards.isEmpty()) {
-			punctuation-=10;
-		}else {
+				.filter(c -> !combinationCards.contains(c))
+				.toList();
+
+		if (remainingCards.isEmpty()) {
+			punctuation -= 10;
+		} else {
 			punctuation = remainingCards.stream()
-						 .mapToInt(c -> c.getValue().getValue())
-						 .sum();
+					.mapToInt(c -> c.getValue().getValue())
+					.sum();
 		}
-		
+
 		return punctuation;
-		
+
 	}
 
-	public int currentPoints(List<Combination> combinations, List<Card> hand , int points) {
+	public int currentPoints(List<Combination> combinations, List<Card> hand, int points) {
 
 		List<Card> remainingCards = new ArrayList<>();
 		Set<Card> combinationCards;
 		int punctuation;
-		
+
 		combinationCards = combinations.stream()
-							.flatMap(c -> c.getCards().stream())
-							.collect(Collectors.toSet());
-		
+				.flatMap(c -> c.getCards().stream())
+				.collect(Collectors.toSet());
+
 		remainingCards = hand.stream()
-						.filter(c -> !combinationCards.contains(c))
-						.toList();
-		
-		if(remainingCards.isEmpty()) {
-			punctuation=-10;
-		}else {
-			punctuation = remainingCards.stream()
-						 .mapToInt(c -> c.getValue().getValue())
-						 .sum();
+				.filter(c -> !combinationCards.contains(c))
+				.toList();
+
+		if (remainingCards.isEmpty()) {
+			punctuation = -10;
+		} else {
+			punctuation = remainingCards.stream().mapToInt(c -> c.getValue().getValue()).sum();
 		}
-		
-		
+
 		return points + punctuation;
-		
+
 	}
-	
+
 	public List<Card> protectedCards(List<Card> hand) {
 
 		List<Combination> combinations = new ArrayList<>(analyzer.obtainCombinations(hand));
 		List<Card> combinatedCards = new ArrayList<>();
-		List<Card> protectedCards= new ArrayList<>();
+		List<Card> protectedCards = new ArrayList<>();
 
 		combinatedCards = combinations.stream()
-						 .flatMap(c -> c.getCards().stream())
-						 .toList();
-		
+				.flatMap(c -> c.getCards().stream())
+				.toList();
+
 		protectedCards.addAll(combinatedCards);
-		
+
 		protectedCards.addAll(findAlmostLadders(hand));
-		
+
 		protectedCards.addAll(findAlmostTriples(hand));
-		
+
 		return protectedCards;
-		
+
 	}
 
 	public List<Card> cardsForSearch(List<Card> hand) {
@@ -301,45 +299,123 @@ public class CombinationAnalyzer {
 		return sequence;
 
 	}
-	
+
 	private void adjustLaddersForAlmostTriples(List<Combination> ladders, List<Card> remaining) {
 
-	    List<Card> almostTripleCards = findAlmostTriples(remaining);
-	    Set<Value> almostTripleValues= new HashSet<>();
-	    List<Card> cards = new ArrayList<>();
-	    Card c1,c2;
+		List<Card> almostTripleCards = findAlmostTriples(remaining);
+		Set<Value> almostTripleValues = new HashSet<>();
+		List<Card> cards = new ArrayList<>();
+		Card c1, c2;
 
-	    if (almostTripleCards.isEmpty()) {
-	    	return;
-	    }
+		if (almostTripleCards.isEmpty()) {
+			return;
+		}
 
-	    almostTripleValues = almostTripleCards.stream()
-	            .map(Card::getValue)
-	            .collect(Collectors.toSet());
+		almostTripleValues = almostTripleCards.stream()
+				.map(Card::getValue)
+				.collect(Collectors.toSet());
 
-	    for (Combination ladder : ladders) {
+		for (Combination ladder : ladders) {
 
-	        cards = ladder.getCards();
+			cards = ladder.getCards();
 
-	        if (cards.size() >= 4) {
+			if (cards.size() >= 4) {
 
-	        c1 = cards.get(0);
-	        c2 = cards.get(cards.size() - 1);
+				c1 = cards.get(0);
+				c2 = cards.get(cards.size() - 1);
 
-	        if (almostTripleValues.contains(c1.getValue())) {
-	            cards.remove(c1);
-	            remaining.add(c1);
-	            return;
-	        }
+				if (almostTripleValues.contains(c1.getValue())) {
+					cards.remove(c1);
+					remaining.add(c1);
+					return;
+				}
 
-	        if (almostTripleValues.contains(c2.getValue())) {
-	            cards.remove(c2);
-	            remaining.add(c2);
-	            return;
-	        }
-	        }
-	    }
+				if (almostTripleValues.contains(c2.getValue())) {
+					cards.remove(c2);
+					remaining.add(c2);
+					return;
+				}
+			}
+		}
 	}
 
-	
+	public String combinatedCardsToString(List<Card> hand) {
+		List<Combination> combinations = new ArrayList<>(obtainCombinations(hand));
+		StringBuilder sb = new StringBuilder();
+
+		for (Combination comb : combinations) {
+
+			sb.append(String.format("%s -> ", comb.getType().getName()));
+			
+			sb.append(comb.getCards().stream().map(c -> c.toString()).collect(Collectors.joining(" ")));
+		}
+
+		return sb.toString();
+
+	}
+
+	public String nonCombinatedCardsToString(List<Card> hand) {
+
+		List<Combination> combinations = new ArrayList<>(analyzer.obtainCombinations(hand));
+		StringBuilder sb = new StringBuilder();
+		List<Card> remaining = new ArrayList<>(hand);
+		List<Card> combinationsCards = new ArrayList<>();
+		List<Card> cards = new ArrayList<>();
+		Card first, last;
+		int index;
+
+		combinationsCards = combinations.stream()
+				.flatMap(c -> c.getCards().stream()).toList();
+
+		remaining.removeAll(combinationsCards);
+
+		if (!remaining.isEmpty()) {
+			sb.append(String.format("===== Cartas sin combinar (para descarte) =====\n"));
+
+			for (int i = 0; i < remaining.size(); i++) {
+				sb.append(String.format("%d) %s\n", i + 1, remaining.get(i)));
+			}
+
+		} else {
+			sb.append("===== Cartas para descarte =====\n");
+			sb.append("Todas tus cartas actuales hacen combinaciones...\n");
+			sb.append("Puedes romper una combinación larga (≥4) para descartar una carta:\n\n");
+
+			index = 1;
+
+			for (Combination comb : combinations) {
+
+				if (comb.getCards().size() >= 4) {
+
+					cards = comb.getCards();
+
+					if (comb.getType() == CombinationType.LADDER) {
+
+						sb.append(String.format(">> Escalera de tamaño %d:\n", cards.size()));
+
+						first = cards.get(0);
+						last = cards.get(cards.size() - 1);
+
+						sb.append(String.format("\t%d) %s (primer carta)\n", index++, first));
+						sb.append(String.format("\t%d) %s (última carta)\n", index++, last));
+
+						sb.append("\n");
+
+					} else if (comb.getType() == CombinationType.TRIPLE) {
+
+						sb.append(String.format(">> Trío de tamaño %d:\n", cards.size()));
+
+						for (Card c : cards) {
+							sb.append(String.format("\t%d) %s\n", index++, c));
+						}
+
+						sb.append("\n");
+					}
+				}
+			}
+		}
+
+		return sb.toString();
+	}
+
 }

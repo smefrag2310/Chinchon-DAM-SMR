@@ -3,6 +3,10 @@ package chinchon.app;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+/**
+ * 
+ */
+
 public class ConsoleInput {
 
 	private Scanner keyboard;
