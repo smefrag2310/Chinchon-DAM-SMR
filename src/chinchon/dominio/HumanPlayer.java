@@ -6,14 +6,46 @@ import java.util.List;
 import chinchon.app.ConsoleInput;
 import chinchon.app.Round;
 
+/**
+ * Represents a human-controlled player in the Chinchon game.
+ * <p>
+ * This class handles all user interactions through the console, including:
+ * <ul>
+ *   <li>Choosing where to draw a card from</li>
+ *   <li>Selecting a card to discard</li>
+ *   <li>Deciding whether to end the round when allowed</li>
+ * </ul>
+ * Human players rely on {@link ConsoleInput} for input and output, and use
+ * the shared {@link CombinationAnalyzer} logic inherited from {@link Player}.
+ */
+
 public class HumanPlayer extends Player {
 
 	private ConsoleInput console;
 
+	/**
+     * Creates a new human player with the given name.
+     *
+     * @param name the player's nickname
+     */
+	
 	public HumanPlayer(String name) {
 		super(name);
 		console = ConsoleInput.getInstance();
 	}
+	
+	/**
+     * Executes the decision-making process for a human player during their turn.
+     * <p>
+     * The process consists of:
+     * <ol>
+     *   <li>Displaying the player's current hand</li>
+     *   <li>Drawing a card (deck or discard pile)</li>
+     *   <li>Discarding a card or optionally ending the round</li>
+     * </ol>
+     *
+     * @param round the current round context
+     */
 
 	@Override
 	public void decisionMaking(Round round) {
@@ -24,6 +56,17 @@ public class HumanPlayer extends Player {
 		discardACardOrEnd(round);
 
 	}
+	
+	/**
+     * Allows the player to choose where to draw a card from:
+     * <ul>
+     *   <li>1 → Draw from the deck</li>
+     *   <li>2 → Draw from the discard pile</li>
+     * </ul>
+     * After drawing, the method checks whether the player has achieved Chinchón.
+     *
+     * @param round the current round context
+     */
 
 	private void drawACard(Round round) {
 
@@ -43,6 +86,24 @@ public class HumanPlayer extends Player {
 		
 		round.checkForChinchon(this);
 	}
+	
+	 /**
+     * Allows the player to discard a card, and optionally end the round if allowed.
+     * <p>
+     * A player may end the round only if:
+     * <ul>
+     *   <li>They have at least 6 cards forming combinations</li>
+     *   <li>It is not the first turn of the round</li>
+     *   <li>The resulting score does not exceed the maximum allowed</li>
+     * </ul>
+     * The method handles two discard modes:
+     * <ul>
+     *   <li>Normal discard (choose any card)</li>
+     *   <li>Strategic discard when ending the round (only discardable cards)</li>
+     * </ul>
+     *
+     * @param round the current round context
+     */
 
 	private void discardACardOrEnd(Round round) {
 

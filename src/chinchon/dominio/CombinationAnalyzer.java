@@ -7,20 +7,59 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Provides all logic related to detecting, evaluating, and scoring card
+ * combinations in the Chinchon game.
+ * <p>
+ * This class follows the Singleton pattern and centralizes the rules for:
+ * <ul>
+ *   <li>Detecting ladders (runs)</li>
+ *   <li>Detecting triples (three of a kind)</li>
+ *   <li>Detecting Chinchon (perfect 7-card run)</li>
+ *   <li>Adjusting ladders to help form triples</li>
+ *   <li>Calculating round and cumulative points</li>
+ *   <li>Identifying protected cards and cards needed to complete combinations</li>
+ * </ul>
+ * It is one of the core components of the game logic.
+ */
+
 public class CombinationAnalyzer {
 
 	private static CombinationAnalyzer analyzer;
 
-	private CombinationAnalyzer() {
+	/**
+     * Private constructor to enforce Singleton pattern.
+     */
+	
+	private CombinationAnalyzer() {}
 
-	}
-
+	/**
+     * Returns the shared instance of the {@code CombinationAnalyzer}.
+     *
+     * @return the singleton instance
+     */
+	
 	public static CombinationAnalyzer getInstance() {
 		if (analyzer == null) {
 			analyzer = new CombinationAnalyzer();
 		}
 		return analyzer;
 	}
+	
+	/**
+     * Detects all valid combinations in a player's hand.
+     * <p>
+     * The detection process follows this order:
+     * <ol>
+     *   <li>Find all ladders and Chinchon</li>
+     *   <li>Adjust ladders to help complete potential triples</li>
+     *   <li>Remove used cards</li>
+     *   <li>Find all triples</li>
+     * </ol>
+     *
+     * @param hand the list of cards in the player's hand
+     * @return a list of detected combinations
+     */
 
 	public List<Combination> obtainCombinations(List<Card> hand) {
 
@@ -46,6 +85,13 @@ public class CombinationAnalyzer {
 
 		return combinations;
 	}
+	
+	 /**
+     * Checks whether the hand contains at least 6 cards forming valid combinations.
+     *
+     * @param hand the player's hand
+     * @return {@code true} if at least 6 cards form combinations
+     */
 
 	public boolean checkCombinations(List<Card> hand) {
 
@@ -58,6 +104,15 @@ public class CombinationAnalyzer {
 		return combinationsCards.size() >= 6;
 
 	}
+	
+	/**
+     * Detects all ladders (runs) and Chinchón (7‑card run) in the hand.
+     * <p>
+     * Cards are grouped by suit and sorted by value before scanning for sequences.
+     *
+     * @param remaining the cards to analyze
+     * @return a list of ladder or Chinchón combinations
+     */
 
 	public List<Combination> findLadderAndChinchon(List<Card> remaining) {
 
@@ -99,6 +154,13 @@ public class CombinationAnalyzer {
 		}
 		return sequence;
 	}
+	
+	 /**
+     * Detects all triples (three cards of the same value).
+     *
+     * @param remaining the cards to analyze
+     * @return a list of triple combinations
+     */
 
 	public List<Combination> findEqualNumber(List<Card> remaining) {
 
@@ -117,6 +179,13 @@ public class CombinationAnalyzer {
 		}
 		return sequence;
 	}
+	
+	 /**
+     * Creates a ladder or Chinchon combination depending on the size of the list.
+     *
+     * @param list the ordered list of cards forming the sequence
+     * @return a ladder or Chinchon combination
+     */
 
 	public Combination createLadderOrChinchon(List<Card> list) {
 		if (list.size() == 7) {
@@ -124,10 +193,32 @@ public class CombinationAnalyzer {
 		}
 		return new Combination(list, CombinationType.LADDER);
 	}
+	
+	/**
+     * Creates a triple combination.
+     *
+     * @param list the cards forming the triple
+     * @return a triple combination
+     */
 
 	public Combination createTriples(List<Card> list) {
 		return new Combination(list, CombinationType.TRIPLE);
 	}
+	
+	/**
+     * Calculates the points obtained in a round based on the remaining cards
+     * after forming combinations.
+     * <p>
+     * Rules:
+     * <ul>
+     *   <li>If no cards remain → −10 points</li>
+     *   <li>Otherwise → sum of remaining card values</li>
+     * </ul>
+     *
+     * @param combinations the detected combinations
+     * @param hand the player's full hand
+     * @return the points earned in the round
+     */
 
 	public int calculatePoints(List<Combination> combinations, List<Card> hand) {
 
@@ -152,6 +243,16 @@ public class CombinationAnalyzer {
 		return punctuation;
 
 	}
+	
+	/**
+     * Calculates the player's updated total score after adding the points
+     * from the current round.
+     *
+     * @param combinations the detected combinations
+     * @param hand the player's hand
+     * @param points the player's current total points
+     * @return the updated total score
+     */
 
 	public int currentPoints(List<Combination> combinations, List<Card> hand, int points) {
 
@@ -176,6 +277,14 @@ public class CombinationAnalyzer {
 		return points + punctuation;
 
 	}
+	
+	/**
+     * Returns all cards that should be considered "protected", meaning they
+     * belong to combinations or are close to forming one.
+     *
+     * @param hand the player's hand
+     * @return a list of protected cards
+     */
 
 	public List<Card> protectedCards(List<Card> hand) {
 
@@ -196,6 +305,15 @@ public class CombinationAnalyzer {
 		return protectedCards;
 
 	}
+	
+	/**
+     * Returns a list of cards that would complete potential ladders or triples.
+     * <p>
+     * This is used by the AI to decide which cards to search for or keep.
+     *
+     * @param hand the player's hand
+     * @return a list of hypothetical cards that would complete combinations
+     */
 
 	public List<Card> cardsForSearch(List<Card> hand) {
 
@@ -246,6 +364,13 @@ public class CombinationAnalyzer {
 		return missing;
 
 	}
+	
+	 /**
+     * Finds pairs of cards that are close to forming a ladder (run).
+     *
+     * @param cards the cards to analyze
+     * @return a list of cards that are part of near‑ladder sequences
+     */
 
 	public List<Card> findAlmostLadders(List<Card> cards) {
 
@@ -282,6 +407,13 @@ public class CombinationAnalyzer {
 		return sequence;
 
 	}
+	
+	/**
+     * Finds pairs of cards that are close to forming a triple.
+     *
+     * @param cards the cards to analyze
+     * @return a list of cards that form near‑triples
+     */
 
 	public List<Card> findAlmostTriples(List<Card> cards) {
 
@@ -299,6 +431,15 @@ public class CombinationAnalyzer {
 		return sequence;
 
 	}
+	
+	/**
+     * Adjusts ladders by removing an end card if doing so helps complete a triple.
+     * <p>
+     * This rule improves AI behavior by prioritizing triples when possible.
+     *
+     * @param ladders   the detected ladders
+     * @param remaining the remaining cards in the hand
+     */
 
 	private void adjustLaddersForAlmostTriples(List<Combination> ladders, List<Card> remaining) {
 
@@ -338,6 +479,13 @@ public class CombinationAnalyzer {
 			}
 		}
 	}
+	
+	/**
+     * Returns a formatted string describing all combinations in the hand.
+     *
+     * @param hand the player's hand
+     * @return a formatted string of combinations
+     */
 
 	public String combinatedCardsToString(List<Card> hand) {
 		List<Combination> combinations = new ArrayList<>(obtainCombinations(hand));
@@ -353,6 +501,16 @@ public class CombinationAnalyzer {
 		return sb.toString();
 
 	}
+	
+	/**
+     * Returns a formatted string describing all non‑combined cards in the hand.
+     * <p>
+     * If all cards form combinations, the method suggests which cards could be
+     * discarded by breaking long combinations.
+     *
+     * @param hand the player's hand
+     * @return a formatted string of non-combined cards or discard suggestions
+     */
 
 	public String nonCombinatedCardsToString(List<Card> hand) {
 
