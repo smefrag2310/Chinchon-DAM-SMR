@@ -135,10 +135,11 @@ public class WhiteBoxTests {
 	@Test
     public void returnACopyOfDiscardPileAndClearDiscardPile() {
         DiscardPile pile = new DiscardPile();
+        List<Card> returned;
         pile.addCard(new Card(Suit.COINS, Value.FIVE));
         pile.addCard(new Card(Suit.CLUBS, Value.JACK));
 
-        var returned = pile.clearAndReturn();
+        returned = pile.clearAndReturn();
 
         assertEquals(2, returned.size());
         assertTrue(pile.getCards().isEmpty());
