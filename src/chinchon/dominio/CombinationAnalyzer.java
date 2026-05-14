@@ -226,7 +226,9 @@ public class CombinationAnalyzer {
 		Set<Card> combinationCards;
 		int punctuation = 0;
 
-		combinationCards = combinations.stream().flatMap(c -> c.getCards().stream()).collect(Collectors.toSet());
+		combinationCards = combinations.stream()
+				.flatMap(c -> c.getCards().stream())
+				.collect(Collectors.toSet());
 
 		remainingCards = hand.stream()
 				.filter(c -> !combinationCards.contains(c))
@@ -495,7 +497,9 @@ public class CombinationAnalyzer {
 
 			sb.append(String.format("%s -> ", comb.getType().getName()));
 			
-			sb.append(comb.getCards().stream().map(c -> c.toString()).collect(Collectors.joining(" ")));
+			sb.append(comb.getCards().stream()
+					.map(c -> c.toString())
+					.collect(Collectors.joining(" ")));
 		}
 
 		return sb.toString();
@@ -554,7 +558,7 @@ public class CombinationAnalyzer {
 						first = cards.get(0);
 						last = cards.get(cards.size() - 1);
 
-						sb.append(String.format("\t%d) %s (primer carta)\n", index++, first));
+						sb.append(String.format("\t%d) %s (primera carta)\n", index++, first));
 						sb.append(String.format("\t%d) %s (última carta)\n", index++, last));
 
 						sb.append("\n");

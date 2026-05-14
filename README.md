@@ -340,3 +340,61 @@ En otras palabras:
 
 ---
 
+##  🧪 Pruebas unitarias (JUnit)  
+
+El proyecto incluye un conjunto de pruebas unitarias desarrolladas con JUnit 5, diseñadas para validar el comportamiento del motor de combinaciones, los jugadores, la pila de descarte y otros componentes clave del juego Chinchón.
+
+- Se han realizado pruebas de caja negra donde se valida el comportamiento de los métodos sin observar su implementación interna
+- Se han utilizado pruebas de caja blanca para cubrir la mayoría de posibilidades de ciertos métodos
+
+### ✔️ Pruebas de Caja Negra
+
+#### Detección de tríos 
+
+![Detección de tríos](assets/detectsTripleCorrectly.png)
+
+#### Detección de escaleras
+
+![Detección de escaleras](assets/detectsLadderCorrectly.png)
+
+#### Detección de chinchón 
+
+![Detección de chinchón](assets/detectsChinchonCorrectly.png)
+
+#### Devuelve solo las no combinadas 
+
+![Devuelve no combinadas](assets/returnNonCombinatedCards.png)
+
+#### Devuelve la última carta puesta en la pila de descarte 
+
+![Devuelve última carta pila de descarte](assets/returnCorrectlyLastCardFromDiscardPile.png)
+
+#### Crea correctamente al jugador IA 
+
+![Creación de jugador máquina](assets/correctCreationOfMachinePlayer.png)
+
+### ✔️ Pruebas de Caja Blanca
+
+#### Detección de tríos y escalera de forma simultánea
+
+![Detección tríos y escaleras](assets/detectsCorrectlyLadderAndTripleSimultaneously.png)
+
+#### El método protectedCards devuelve combinaciones, casi triples y casi escaleras
+
+![Método protectedCards](assets/protectedCardsIncludesCombinationsAndAlmostLaddersTriples.png)
+
+#### Si todas las cartas están combinadas y hay una escalera con 4 o más cartas devuelve la primera y última para descartarlas 
+
+![Devolución primera y última](assets/returnFirstAndLastOfLaddersWhenAllAreCombinated.png)
+
+#### En las mismas condiciones, devuelve todos los valores de los triples también
+
+![Devolución escalera y todas de triple](assets/returnFirstAndLastOfLaddersWhenAllAreCombinatedAndAllOfTheTriplesCombinations.png)
+
+#### Devuelve las cartas que no estén combinadas para descartarlas
+
+![Devuelve cartas no combinadas](assets/returnOnlyNonCombinatedCards.png)
+
+#### Devuelve una copia de la pila de descarte y elimina su contenido
+
+![Devolución y limpieza de la pila de descarte](assets/returnACopyOfDiscardPileAndClearDiscardPile.png)

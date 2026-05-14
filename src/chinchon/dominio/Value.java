@@ -14,7 +14,7 @@ package chinchon.dominio;
  */
 
 public enum Value {
-	UNO(1,1),DOS(2,2),TRES(3,3),CUATRO(4,4),CINCO(5,5),SEIS(6,6),SIETE(7,7),DIEZ(10,8),ONCE(11,9),DOCE(12,10);
+	ONE(1,1),TWO(2,2),THREE(3,3),FOUR(4,4),FIVE(5,5),SIX(6,6),SEVEN(7,7),JACK(10,8),HORSE(11,9),KING(12,10);
 	
 	private int value;
 	private int order;

@@ -195,7 +195,6 @@ public class MachinePlayer extends Player {
 		if (canEndRound) {
 			round.setRoundEnd(true);
 		}
-
 	}
 
 }
