@@ -78,7 +78,7 @@ Cada jugador realiza:
 3. **Comprobación de Chinchón**  
    - Si un jugador forma un Chinchón, gana automáticamente.
 
-- **Las condiciones para cerrrar la ronda son las siguientes:**s
+- **Las condiciones para cerrrar la ronda son las siguientes:**
     - Debe tener 6 o más cartas combinadas (Se encarga combinationAnalyzer).
     - No se puede cerrar la ronda en turno 1.
     - La puntuación que se obtendría por cerrar la ronda no puede superar el máximo de puntos definida en el inicio de la partida. 
